@@ -1,6 +1,7 @@
 // src/app/owner/orders/page.tsx
 import { adminDb } from "@/lib/firebase-admin";
 import { SITE_KEY } from "@/lib/atoms/siteKeyAtom";
+import Pager from "./Pager";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,7 +24,7 @@ type OrderDoc = {
   customer?: {
     name?: string;
     email?: string;
-    phone?: string;              // ← 追加：電話番号
+    phone?: string; // ← 追加：電話番号
     address?: Address;
   };
   /** 互換: 古いドキュメントで address がルートにある場合に備える */
@@ -69,21 +70,42 @@ function formatAddressFromOrder(o: OrderDoc) {
   return parts.length ? parts.join(" ") : "—";
 }
 
-export default async function OrdersPage() {
+const PAGE_SIZE = 10;
+
+export default async function OrdersPage({
+  // ★ Next.js 15+ では searchParams は Promise。await してから使う
+  searchParams,
+}: {
+  searchParams: Promise<{ p?: string }>;
+}) {
+  const sp = await searchParams; // ← エラー修正ポイント
+  const page = Math.max(1, Number(sp?.p ?? "1"));
+  const startIndex = (page - 1) * PAGE_SIZE;
+
   const snap = await adminDb
     .collection("siteOrders")
     .where("siteKey", "==", SITE_KEY)
     .orderBy("createdAt", "desc")
-    .limit(50)
+    .limit(50) // 直近50件を対象にページング
     .get();
 
   const rows = snap.docs.map((d) => ({ id: d.id, ...(d.data() as OrderDoc) }));
+  const pageRows = rows.slice(startIndex, startIndex + PAGE_SIZE);
 
   return (
     <main className="max-w-6xl mx-auto p-4 sm:p-6">
-      <h1 className="text-2xl font-semibold mb-4 text-white text-outline">
-        販売履歴
-      </h1>
+      <div className="flex items-center justify-between mb-3">
+        <h1 className="text-2xl font-semibold text-white text-outline">
+          販売履歴
+        </h1>
+
+        {/* ← → ページング（Jotaiで状態保持&URL同期） */}
+        <Pager
+          initialPage={page}
+          totalCount={rows.length}
+          pageSize={PAGE_SIZE}
+        />
+      </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow-md">
         <table className="w-full text-sm border-collapse">
@@ -101,14 +123,13 @@ export default async function OrdersPage() {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                {/* 列数はそのまま 6 */}
                 <td className="p-6 text-center text-gray-500" colSpan={6}>
                   販売履歴はまだありません
                 </td>
               </tr>
             )}
 
-            {rows.map((o) => {
+            {pageRows.map((o) => {
               const dt = tsToDate(o.createdAt);
               const total =
                 typeof o.amount_total === "number"
@@ -196,7 +217,8 @@ export default async function OrdersPage() {
       </div>
 
       <p className="text-gray-400 text-xs mt-2">
-        ※ 顧客名・メール・<span className="font-medium">電話番号</span>・住所・商品内容を確認のうえ、発送や連絡にご利用ください。
+        ※ 顧客名・メール・<span className="font-medium">電話番号</span>
+        ・住所・商品内容を確認のうえ、発送や連絡にご利用ください。
       </p>
     </main>
   );
