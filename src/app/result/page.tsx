@@ -1,13 +1,19 @@
 import Link from "next/link";
 import ResultClient from "./ResultClient";
 
-export default function ResultPage({
+type SP = { session_id?: string | string[]; status?: string | string[] };
+
+export default async function ResultPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string; status?: string };
+  searchParams: Promise<SP>;
 }) {
-  const sessionId = searchParams.session_id ?? null;
-  const status = searchParams.status ?? "unknown";
+  const sp = await searchParams;
+  const pick = (v?: string | string[] | null) =>
+    Array.isArray(v) ? v[0] : v ?? undefined;
+
+  const sessionId = pick(sp.session_id) ?? null;
+  const status = pick(sp.status) ?? "unknown";
 
   return (
     <main className="min-h-[60vh] max-w-lg mx-auto p-6 pt-24 space-y-6">
