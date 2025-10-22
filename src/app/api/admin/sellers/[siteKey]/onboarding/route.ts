@@ -1,5 +1,5 @@
 // app/api/admin/sellers/[siteKey]/onboarding/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
@@ -10,7 +10,7 @@ function forbidden(msg = "forbidden") {
 }
 
 export async function GET(
-  _req: NextRequest,
+  _req: Request,
   { params }: { params: { siteKey: string } }
 ) {
   const doc = await adminDb.doc(`siteSellers/${params.siteKey}`).get();
@@ -22,7 +22,7 @@ export async function GET(
 }
 
 export async function PATCH(
-  req: NextRequest,
+  req: Request,
   { params }: { params: { siteKey: string } }
 ) {
   // すぐに既存の認証に置き換えてOK
