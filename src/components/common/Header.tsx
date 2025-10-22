@@ -43,6 +43,7 @@ type Keys =
   | "analytics"
   | "orders"
   | "inventory"
+  | "reports"
   | "admin";
 
 const T: Record<UILangType, Record<Keys, string>> = {
@@ -62,6 +63,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "分析",
     orders: "注文履歴",
     inventory: "在庫管理",
+    reports: "レポート",
     admin: "管理者ログイン",
   },
   en: {
@@ -80,6 +82,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Analyses",
     orders: "Order History",
     inventory: "Inventory Management",
+    reports: "Reports",
     admin: "Administrator Login",
   },
   zh: {
@@ -98,6 +101,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "分析",
     orders: "销售记录",
     inventory: "库存管理",
+    reports: "报告",
     admin: "管理员登录",
   },
   "zh-TW": {
@@ -116,6 +120,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "分析",
     orders: "銷售記錄",
     inventory: "庫存管理",
+    reports: "報告",
     admin: "管理者登入",
   },
   ko: {
@@ -134,6 +139,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "분석",
     orders: "판매 내역",
     inventory: "재고 관리",
+    reports: "보고서",
     admin: "관리자 로그인",
   },
   fr: {
@@ -152,6 +158,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Analyses",
     orders: "Historique des commandes",
     inventory: "Gestion des stocks",
+    reports: "Rapports",
     admin: "Connexion administrateur",
   },
   es: {
@@ -170,6 +177,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Analítica",
     orders: "Historial de pedidos",
     inventory: "Gestión de inventario",
+    reports: "Informes",
     admin: "Inicio de sesión administrador",
   },
   de: {
@@ -188,6 +196,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Analytik",
     orders: "Bestellverlauf",
     inventory: "Bestandsverwaltung",
+    reports: "Berichte",
     admin: "Admin-Anmeldung",
   },
   pt: {
@@ -206,6 +215,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Análises",
     orders: "Histórico de Pedidos",
     inventory: "Gerenciamento de Inventário",
+    reports: "Relatórios",
     admin: "Login do administrador",
   },
   it: {
@@ -224,6 +234,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Analitiche",
     orders: "Cronologia ordini",
     inventory: "Gestione inventario",
+    reports: "Report",
     admin: "Accesso amministratore",
   },
   ru: {
@@ -242,6 +253,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Аналитика",
     orders: "История заказов",
     inventory: "Управление запасами",
+    reports: "Отчеты",
     admin: "Вход администратора",
   },
   th: {
@@ -260,6 +272,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "วิเคราะห์",
     orders: "ประวัติการสั่งซื้อ",
     inventory: "การจัดการสินค้าคงคลัง",
+    reports: "รายงาน",
     admin: "เข้าสู่ระบบผู้ดูแล",
   },
   vi: {
@@ -278,6 +291,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Phân tích",
     orders: "Lịch sử đơn hàng",
     inventory: "Quản lý tồn kho",
+    reports: "Báo cáo",
     admin: "Đăng nhập quản trị",
   },
   id: {
@@ -296,6 +310,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "Analitik",
     orders: "Riwayat pesanan",
     inventory: "Manajemen inventaris",
+    reports: "Laporan",
     admin: "Masuk admin",
   },
   hi: {
@@ -314,6 +329,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "विश्लेषण",
     orders: "ऑर्डर इतिहास",
     inventory: "इन्वेंटरी प्रबंधन",
+    reports: "रिपोर्ट",
     admin: "प्रशासक लॉगिन",
   },
   ar: {
@@ -332,6 +348,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     analytics: "التحليلات",
     orders: "تاريخ الطلبات",
     inventory: "إدارة المخزون",
+    reports: "التقارير",
     admin: "تسجيل دخول المسؤول",
   },
 };
@@ -352,6 +369,7 @@ type MenuKey =
   | "analytics"
   | "orders"
   | "inventory"
+  | "reports"
   | "admin";
 
 type MenuItem = { key: MenuKey; href: string; external?: boolean };
@@ -374,6 +392,7 @@ const FOOTER_ITEMS: MenuItem[] = [
   { key: "analytics", href: "/analytics" },
   { key: "orders", href: "/owner/orders" },
   { key: "inventory", href: "/owner/inventory" },
+  { key: "reports", href: "/owner/reports" },
   { key: "admin", href: "/login" },
 ];
 
@@ -699,6 +718,7 @@ export default function Header({ className = "" }: { className?: string }) {
                       "analytics",
                       "orders",
                       "inventory",
+                      "reports",
                     ].includes(m.key)
                   )
                     // ← 注文履歴は Stripe 連携済みのときのみ出す
