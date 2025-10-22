@@ -1,0 +1,13 @@
+[
+  {
+    "origin": [
+      "https://www.xenovant.shop",
+      "https://xenovant-homepage-tsuyoshi-saitos-projects.vercel.app",
+      "http://localhost:3000",
+      "http://192.168.0.212:3000"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "x-goog-meta-custom"]
+  }
+]

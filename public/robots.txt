@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://xenovant.shop
+
+# Sitemaps
+Sitemap: https://xenovant.shop/sitemap.xml
