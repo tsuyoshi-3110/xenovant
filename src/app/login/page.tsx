@@ -147,7 +147,7 @@ function StripeConnectCard() {
 /* =========================
    Ship&co への導線カード（アカウント作成リンク）
 ========================= */
-export function ShipAndCoLinkCard() {
+ function ShipAndCoLinkCard() {
   return (
     <Card className="shadow-xl bg-white/70 backdrop-blur-sm border border-gray-200">
       <CardHeader>
