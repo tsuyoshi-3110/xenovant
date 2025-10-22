@@ -14,16 +14,56 @@ const PLATFORM_FEE_RATE = 0.07;
 type CheckoutLocale = Stripe.Checkout.SessionCreateParams.Locale;
 function normalizeCheckoutLocale(uiLang?: string | null): CheckoutLocale {
   const ok: CheckoutLocale[] = [
-    "auto","bg","cs","da","de","el","en","en-GB","es","es-419","et","fi","fil","fr","fr-CA",
-    "hr","hu","id","it","ja","ko","lt","lv","ms","mt","nb","nl","pl","pt","pt-BR","ro","ru",
-    "sk","sl","sv","th","tr","vi","zh","zh-HK","zh-TW",
+    "auto",
+    "bg",
+    "cs",
+    "da",
+    "de",
+    "el",
+    "en",
+    "en-GB",
+    "es",
+    "es-419",
+    "et",
+    "fi",
+    "fil",
+    "fr",
+    "fr-CA",
+    "hr",
+    "hu",
+    "id",
+    "it",
+    "ja",
+    "ko",
+    "lt",
+    "lv",
+    "ms",
+    "mt",
+    "nb",
+    "nl",
+    "pl",
+    "pt",
+    "pt-BR",
+    "ro",
+    "ru",
+    "sk",
+    "sl",
+    "sv",
+    "th",
+    "tr",
+    "vi",
+    "zh",
+    "zh-HK",
+    "zh-TW",
   ];
   const s = (uiLang ?? "").trim();
   if (!s) return "auto";
   if (s.toLowerCase() === "en") return "en-GB";
-  const hit = ok.find(v => v.toLowerCase() === s.toLowerCase());
+  const hit = ok.find((v) => v.toLowerCase() === s.toLowerCase());
   if (hit) return hit;
-  const base = ok.find(v => v.toLowerCase() === s.split("-")[0].toLowerCase());
+  const base = ok.find(
+    (v) => v.toLowerCase() === s.split("-")[0].toLowerCase()
+  );
   return base ?? "auto";
 }
 
@@ -44,9 +84,17 @@ function isAllowedOrigin(origin: string | null): boolean {
 /* ---------- 多言語タイトル抽出（既存ロジック簡略化版） ---------- */
 type NamesMap = Record<string, string>;
 const CANON_MAP: Record<string, string> = {
-  jp: "ja", kr: "ko", cn: "zh", tw: "zh-TW", hk: "zh-HK",
-  "zh-hant": "zh-TW", "zh_hant": "zh-TW", "zh-hans": "zh", "zh_hans": "zh",
-  ptbr: "pt-BR", "pt_br": "pt-BR",
+  jp: "ja",
+  kr: "ko",
+  cn: "zh",
+  tw: "zh-TW",
+  hk: "zh-HK",
+  "zh-hant": "zh-TW",
+  zh_hant: "zh-TW",
+  "zh-hans": "zh",
+  zh_hans: "zh",
+  ptbr: "pt-BR",
+  pt_br: "pt-BR",
 };
 function canonLang(code: string): string {
   const c = (code ?? "").replace(/_/g, "-").trim().toLowerCase();
@@ -67,7 +115,11 @@ function collectLocalizedNames(data: any): NamesMap {
   if (baseJa) out["ja"] = baseJa;
 
   if (Array.isArray(data?.t)) {
-    for (const row of data.t as Array<{ lang?: string; title?: string; body?: string }>) {
+    for (const row of data.t as Array<{
+      lang?: string;
+      title?: string;
+      body?: string;
+    }>) {
       const code = row?.lang ? canonLang(row.lang) : "";
       const title = pickStr(row?.title) || pickStr(row?.body);
       if (code && title) out[code] = title;
@@ -90,7 +142,11 @@ function collectLocalizedNames(data: any): NamesMap {
   }
   return out;
 }
-function buildNamesMetaMinimal(selLang: string, names: Record<string, string>, display: string) {
+function buildNamesMetaMinimal(
+  selLang: string,
+  names: Record<string, string>,
+  display: string
+) {
   const sel = canonLang(selLang || "ja");
   const ja = names["ja"] || display;
   const baseSel = names[sel] || names[sel.split("-")[0]] || display;
@@ -122,19 +178,28 @@ export async function POST(req: NextRequest) {
 
   // 共通CORSヘッダー
   const corsHeaders = origin
-    ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Credentials": "true" }
+    ? {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Credentials": "true",
+      }
     : undefined;
 
   let body: any;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers: corsHeaders });
+    return NextResponse.json(
+      { error: "Invalid JSON" },
+      { status: 400, headers: corsHeaders }
+    );
   }
 
   const { siteKey, items, lang, origin: bodyOrigin } = body || {};
   if (!siteKey || !Array.isArray(items) || items.length === 0) {
-    return NextResponse.json({ error: "Bad request" }, { status: 400, headers: corsHeaders });
+    return NextResponse.json(
+      { error: "Bad request" },
+      { status: 400, headers: corsHeaders }
+    );
   }
 
   // Connect 口座
@@ -143,14 +208,21 @@ export async function POST(req: NextRequest) {
   // EC 停止中なら決済をブロック
   if (sellerSnap.exists && sellerSnap.get("ecStop") === true) {
     return NextResponse.json(
-      { error: "EC_STOPPED", message: "現在このショップのECは一時停止中です。" },
+      {
+        error: "EC_STOPPED",
+        message: "現在このショップのECは一時停止中です。",
+      },
       { status: 403, headers: corsHeaders }
     );
   }
 
-  const sellerConnectId: string | null = sellerSnap.get("stripe.connectAccountId") || null;
+  const sellerConnectId: string | null =
+    sellerSnap.get("stripe.connectAccountId") || null;
   if (!sellerConnectId || !sellerConnectId.startsWith("acct_")) {
-    return NextResponse.json({ error: "Connect account missing" }, { status: 400, headers: corsHeaders });
+    return NextResponse.json(
+      { error: "Connect account missing" },
+      { status: 400, headers: corsHeaders }
+    );
   }
 
   // 言語→Checkout 表示ロケール（通貨ではない）
@@ -185,7 +257,9 @@ export async function POST(req: NextRequest) {
     const unitJPY = Math.max(
       0,
       Math.floor(
-        Number(data.priceIncl ?? data.price ?? data.priceTaxIncl ?? data.price_incl) || 0
+        Number(
+          data.priceIncl ?? data.price ?? data.priceTaxIncl ?? data.price_incl
+        ) || 0
       )
     );
     if (unitJPY <= 0) continue;
@@ -195,13 +269,14 @@ export async function POST(req: NextRequest) {
     const langBase = reqCanon.split("-")[0]; // ★ ベース言語（例: "ja"）
 
     // ★ 表示名の優先順位を調整：base.title（日本語）を最優先で拾う
+    // ★ base が日本語のため、まず ja を最優先で使う
     const displayName =
-      names[reqCanon] ||
-      names[langBase] ||
-      pickStr(data?.base?.title) ||
       names["ja"] ||
-      pickStr(data?.title) ||
+      names[reqCanon] ||
+      names[reqCanon.split("-")[0]] ||
       names["en"] ||
+      pickStr(data?.base?.title) ||
+      pickStr(data?.title) ||
       "Item";
 
     // ★ メタはベース言語で作成（name_ja を必ず含む）
@@ -235,19 +310,25 @@ export async function POST(req: NextRequest) {
   }
 
   if (!line_items.length) {
-    return NextResponse.json({ error: "No purchasable items" }, { status: 400, headers: corsHeaders });
+    return NextResponse.json(
+      { error: "No purchasable items" },
+      { status: 400, headers: corsHeaders }
+    );
   }
 
   // SCaT: 手数料は後の送金額で控除する
   const platformFeeJPY = Math.floor(subtotalMinorJPY * PLATFORM_FEE_RATE);
 
-  const baseOrigin = bodyOrigin || origin || process.env.NEXT_PUBLIC_ORIGIN || "";
+  const baseOrigin =
+    bodyOrigin || origin || process.env.NEXT_PUBLIC_ORIGIN || "";
   const success_url = `${baseOrigin}/cart?session_id={CHECKOUT_SESSION_ID}&status=success`;
   const cancel_url = `${baseOrigin}/cart`;
 
   try {
     // Separate Charges & Transfers 用の transfer_group
-    const transferGroup = `grp_${siteKey}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const transferGroup = `grp_${siteKey}_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
 
     // 1) Checkout セッション作成（destination charge は使わない）
     const session = await stripeConnect.checkout.sessions.create({
@@ -278,27 +359,36 @@ export async function POST(req: NextRequest) {
     });
 
     // 2) 🔸 pendingOrders に保存（Webhookで在庫減算や送金準備に使用）
-    await adminDb.collection("pendingOrders").doc(session.id).set({
-      siteKey,
-      status: "pending",
-      items: pendingItems, // [{id, name, quantity, unitAmountJPY}]
-      subtotalJPY: subtotalMinorJPY,
-      applicationFeeJPY: platformFeeJPY,
-      uiLang: lang ?? "ja",
-      checkout: {
-        sessionId: session.id,
-        url: session.url,
-        locale,
-        sellerConnectId,
-        transferGroup,
-      },
-      createdAt: new Date(),
-    });
+    await adminDb
+      .collection("pendingOrders")
+      .doc(session.id)
+      .set({
+        siteKey,
+        status: "pending",
+        items: pendingItems, // [{id, name, quantity, unitAmountJPY}]
+        subtotalJPY: subtotalMinorJPY,
+        applicationFeeJPY: platformFeeJPY,
+        uiLang: lang ?? "ja",
+        checkout: {
+          sessionId: session.id,
+          url: session.url,
+          locale,
+          sellerConnectId,
+          transferGroup,
+        },
+        createdAt: new Date(),
+      });
 
     return NextResponse.json({ url: session.url }, { headers: corsHeaders });
   } catch (e: any) {
-    console.error("[/api/checkout/create] error:", e?.message || e, { code: e?.code, type: e?.type });
-    return NextResponse.json({ error: e?.message ?? "internal error" }, { status: 500, headers: corsHeaders });
+    console.error("[/api/checkout/create] error:", e?.message || e, {
+      code: e?.code,
+      type: e?.type,
+    });
+    return NextResponse.json(
+      { error: e?.message ?? "internal error" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
 
@@ -314,10 +404,6 @@ export async function OPTIONS(req: NextRequest) {
     },
   });
 }
-
-
-
-
 
 // // app/api/checkout/create/route.ts
 // import { NextRequest, NextResponse } from "next/server";
