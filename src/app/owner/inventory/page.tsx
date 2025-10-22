@@ -61,7 +61,8 @@ const pad4 = (n: number) => String(n).padStart(4, "0");
 
 function statusOf(s?: StockDoc | null) {
   if (!s) return { label: "在庫未設定", tone: "neutral" as const };
-  if ((s.stockQty ?? 0) <= 0) return { label: "在庫なし", tone: "destructive" as const };
+  if ((s.stockQty ?? 0) <= 0)
+    return { label: "在庫なし", tone: "destructive" as const };
   if ((s.stockQty ?? 0) <= (s.lowStockThreshold || 0))
     return { label: "在庫少なめ", tone: "warning" as const };
   return { label: "在庫あり", tone: "success" as const };
@@ -215,11 +216,17 @@ export default function InventoryPage() {
   // 在庫購読（ログイン後）
   useEffect(() => {
     if (!loggedIn) return;
-    const qRef = query(collection(db, "stock"), where("siteKey", "==", SITE_KEY));
+    const qRef = query(
+      collection(db, "stock"),
+      where("siteKey", "==", SITE_KEY)
+    );
     const unsub = onSnapshot(
       qRef,
       (snap) => {
-        const arr: StockDoc[] = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+        const arr: StockDoc[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as any),
+        }));
         setStocks(arr);
         setPermError(null);
       },
@@ -272,7 +279,6 @@ export default function InventoryPage() {
         }
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, products, stocks]);
 
   // ===== 在庫：± と直接設定 =====
@@ -358,7 +364,8 @@ export default function InventoryPage() {
     await runTransaction(db, async (tx) => {
       const sSnap = await tx.get(stockRef);
       const cSnap = await tx.get(counterRef);
-      const last = (cSnap.exists() ? Number((cSnap.data() as any)?.last) : 0) || 0;
+      const last =
+        (cSnap.exists() ? Number((cSnap.data() as any)?.last) : 0) || 0;
 
       if (sSnap.exists()) {
         const cur = sSnap.data() as any;
@@ -412,7 +419,10 @@ export default function InventoryPage() {
   const rows: Row[] = useMemo(() => {
     const byPid = new Map<string, StockDoc>();
     for (const s of stocks) byPid.set(s.productId, s);
-    return products.map((p) => ({ product: p, stock: byPid.get(productIdOf(p)) || null }));
+    return products.map((p) => ({
+      product: p,
+      stock: byPid.get(productIdOf(p)) || null,
+    }));
   }, [products, stocks]);
 
   const filtered = useMemo(() => {
@@ -436,9 +446,13 @@ export default function InventoryPage() {
         <CardHeader>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <CardTitle className="text-lg sm:text-xl md:text-2xl text-black">在庫管理</CardTitle>
+              <CardTitle className="text-lg sm:text-xl md:text-2xl text-black">
+                在庫管理
+              </CardTitle>
               <p className="mt-1 text-xs sm:text-sm">
-                操作：<strong>＋/−</strong>で1個増減。<strong>数字をタップ</strong>すると直接入力できます。商品コードは自動採番です。
+                操作：<strong>＋/−</strong>で1個増減。
+                <strong>数字をタップ</strong>
+                すると直接入力できます。商品コードは自動採番です。
               </p>
             </div>
             <div className="relative w-full md:w-auto">
@@ -486,26 +500,41 @@ export default function InventoryPage() {
               const row: Row = { product, stock: stock || null };
 
               return (
-                <div key={product.id} className="rounded-xl border border-gray-300 bg-white/70 p-3">
+                <div
+                  key={product.id}
+                  className="rounded-xl border border-gray-300 bg-white/70 p-3"
+                >
                   {/* 上段：状態＋名前 */}
                   <div className="mb-2 flex items-start gap-2">
                     {st.tone === "destructive" ? (
-                      <Badge className="shrink-0 bg-red-200 text-black">在庫なし</Badge>
+                      <Badge className="shrink-0 bg-red-200 text-black">
+                        在庫なし
+                      </Badge>
                     ) : st.tone === "warning" ? (
-                      <Badge className="shrink-0 bg-amber-200 text-black">在庫少なめ</Badge>
+                      <Badge className="shrink-0 bg-amber-200 text-black">
+                        在庫少なめ
+                      </Badge>
                     ) : st.tone === "success" ? (
-                      <Badge className="shrink-0 bg-green-200 text-black">在庫あり</Badge>
+                      <Badge className="shrink-0 bg-green-200 text-black">
+                        在庫あり
+                      </Badge>
                     ) : (
-                      <Badge className="shrink-0 bg-gray-200 text-black">在庫未設定</Badge>
+                      <Badge className="shrink-0 bg-gray-200 text-black">
+                        在庫未設定
+                      </Badge>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold leading-snug break-words">{name}</div>
+                      <div className="font-semibold leading-snug break-words">
+                        {name}
+                      </div>
                     </div>
                   </div>
 
                   {/* 商品コード */}
                   <div className="text-xs">
-                    <span className="inline-block w-20 text-gray-600">商品コード</span>
+                    <span className="inline-block w-20 text-gray-600">
+                      商品コード
+                    </span>
                     <span className="rounded border border-gray-300 bg-gray-100 px-1.5 py-0.5 text-[11px]">
                       {code || "（自動割当）"}
                     </span>
@@ -525,7 +554,9 @@ export default function InventoryPage() {
 
                   {/* しきい値 */}
                   <div className="mt-2 flex items-center justify-between">
-                    <div className="text-sm">しきい値（この数以下で「在庫少なめ」）</div>
+                    <div className="text-sm">
+                      しきい値（この数以下で「在庫少なめ」）
+                    </div>
                     <Stepper
                       value={stock?.lowStockThreshold ?? 0}
                       disabled={!loggedIn || !stock}
@@ -543,7 +574,9 @@ export default function InventoryPage() {
               );
             })}
             {filtered.length === 0 && (
-              <div className="py-12 text-center text-gray-700">該当する商品がありません</div>
+              <div className="py-12 text-center text-gray-700">
+                該当する商品がありません
+              </div>
             )}
           </div>
 
@@ -568,21 +601,36 @@ export default function InventoryPage() {
                   const row: Row = { product, stock: stock || null };
 
                   return (
-                    <tr key={product.id} className="border-t border-gray-200 hover:bg-black/[0.03]">
+                    <tr
+                      key={product.id}
+                      className="border-t border-gray-200 hover:bg-black/[0.03]"
+                    >
                       <td className="px-3 py-2 whitespace-nowrap">
                         {st.tone === "destructive" ? (
-                          <Badge className="bg-red-200 text-black">在庫なし</Badge>
+                          <Badge className="bg-red-200 text-black">
+                            在庫なし
+                          </Badge>
                         ) : st.tone === "warning" ? (
-                          <Badge className="bg-amber-200 text-black">在庫少なめ</Badge>
+                          <Badge className="bg-amber-200 text-black">
+                            在庫少なめ
+                          </Badge>
                         ) : st.tone === "success" ? (
-                          <Badge className="bg-green-200 text-black">在庫あり</Badge>
+                          <Badge className="bg-green-200 text-black">
+                            在庫あり
+                          </Badge>
                         ) : (
-                          <Badge className="bg-gray-200 text-black">在庫未設定</Badge>
+                          <Badge className="bg-gray-200 text-black">
+                            在庫未設定
+                          </Badge>
                         )}
                       </td>
-                      <td className="px-3 py-2 min-w-[16rem] break-words">{name}</td>
+                      <td className="px-3 py-2 min-w-[16rem] break-words">
+                        {name}
+                      </td>
                       <td className="px-3 py-2 break-all">
-                        {code || <span className="text-gray-600">（自動割当）</span>}
+                        {code || (
+                          <span className="text-gray-600">（自動割当）</span>
+                        )}
                       </td>
                       <td className="px-3 py-2">
                         <div className="ml-auto flex w-fit items-center gap-2">
@@ -606,13 +654,18 @@ export default function InventoryPage() {
                           />
                         </div>
                       </td>
-                      <td className="px-3 py-2 text-gray-700">{fmtTs(stock?.updatedAt)}</td>
+                      <td className="px-3 py-2 text-gray-700">
+                        {fmtTs(stock?.updatedAt)}
+                      </td>
                     </tr>
                   );
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-16 text-center text-gray-700">
+                    <td
+                      colSpan={6}
+                      className="px-4 py-16 text-center text-gray-700"
+                    >
                       該当する商品がありません
                     </td>
                   </tr>
@@ -623,9 +676,18 @@ export default function InventoryPage() {
 
           {/* フッターの説明 */}
           <div className="pt-1 text-xs space-y-1">
-            <div>・<strong>商品コード</strong>… 在庫作成の順番で自動採番（例：P0001）。</div>
-            <div>・<strong>しきい値</strong>… 在庫がこの数以下で「在庫少なめ」。0で無効です。</div>
-            <div>・数値は<strong>タップで直接入力</strong>できます（Enterで確定 / Escでキャンセル / フォーカス外れでも確定）。</div>
+            <div>
+              ・<strong>商品コード</strong>…
+              在庫作成の順番で自動採番（例：P0001）。
+            </div>
+            <div>
+              ・<strong>しきい値</strong>…
+              在庫がこの数以下で「在庫少なめ」。0で無効です。
+            </div>
+            <div>
+              ・数値は<strong>タップで直接入力</strong>できます（Enterで確定 /
+              Escでキャンセル / フォーカス外れでも確定）。
+            </div>
           </div>
         </CardContent>
       </Card>

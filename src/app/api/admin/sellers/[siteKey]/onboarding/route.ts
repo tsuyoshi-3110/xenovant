@@ -9,22 +9,27 @@ function forbidden(msg = "forbidden") {
   return NextResponse.json({ error: msg }, { status: 403 });
 }
 
-export async function GET(
-  _req: Request,
-  { params }: { params: { siteKey: string } }
-) {
-  const doc = await adminDb.doc(`siteSellers/${params.siteKey}`).get();
+export async function GET(req: Request, ctx: any) {
+  const siteKey: string | undefined = ctx?.params?.siteKey;
+  if (!siteKey) {
+    return NextResponse.json({ error: "siteKey missing" }, { status: 400 });
+  }
+
+  const doc = await adminDb.doc(`siteSellers/${siteKey}`).get();
   const stripe = (doc.data()?.stripe ?? {}) as { onboardingCompleted?: boolean };
+
   return NextResponse.json({
-    siteKey: params.siteKey,
+    siteKey,
     onboardingCompleted: !!stripe.onboardingCompleted,
   });
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { siteKey: string } }
-) {
+export async function PATCH(req: Request, ctx: any) {
+  const siteKey: string | undefined = ctx?.params?.siteKey;
+  if (!siteKey) {
+    return NextResponse.json({ error: "siteKey missing" }, { status: 400 });
+  }
+
   // すぐに既存の認証に置き換えてOK
   const token = req.headers.get("x-admin-token");
   if (process.env.ADMIN_TOKEN && token !== process.env.ADMIN_TOKEN) {
@@ -40,7 +45,7 @@ export async function PATCH(
     );
   }
 
-  await adminDb.doc(`siteSellers/${params.siteKey}`).set(
+  await adminDb.doc(`siteSellers/${siteKey}`).set(
     { stripe: { onboardingCompleted: value } },
     { merge: true }
   );
