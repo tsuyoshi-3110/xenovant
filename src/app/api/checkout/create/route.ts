@@ -192,18 +192,20 @@ export async function POST(req: NextRequest) {
 
     const names = collectLocalizedNames(data);
     const reqCanon = canonLang(lang || "ja");
-    const baseCanon = canonLang((lang || "ja").split("-")[0]);
+    const langBase = reqCanon.split("-")[0]; // ★ ベース言語（例: "ja"）
 
+    // ★ 表示名の優先順位を調整：base.title（日本語）を最優先で拾う
     const displayName =
       names[reqCanon] ||
-      names[baseCanon] ||
-      names["ja"] ||
-      names["en"] ||
-      pickStr(data?.title) ||
+      names[langBase] ||
       pickStr(data?.base?.title) ||
+      names["ja"] ||
+      pickStr(data?.title) ||
+      names["en"] ||
       "Item";
 
-    const namesMeta = buildNamesMetaMinimal(reqCanon, names, displayName);
+    // ★ メタはベース言語で作成（name_ja を必ず含む）
+    const namesMeta = buildNamesMetaMinimal(langBase, names, displayName);
 
     line_items.push({
       quantity: qty,
