@@ -266,20 +266,24 @@ export async function POST(req: NextRequest) {
 
     const names = collectLocalizedNames(data);
     const reqCanon = canonLang(lang || "ja");
-    const langBase = reqCanon.split("-")[0]; // ★ ベース言語（例: "ja"）
+    const langBase = reqCanon.split("-")[0];
 
-    // ★ 表示名の優先順位を調整：base.title（日本語）を最優先で拾う
-    // ★ base が日本語のため、まず ja を最優先で使う
+    // ★ここを差し替え
     const displayName =
-      names["ja"] ||
+      // 日本語が選ばれている時は必ず base.title（なければ title）を使う
+      (reqCanon.startsWith("ja") &&
+        (pickStr(data?.base?.title) || pickStr(data?.title))) ||
+      // それ以外の言語は、その言語→言語ベース→ja→en の順で
       names[reqCanon] ||
       names[reqCanon.split("-")[0]] ||
+      names["ja"] ||
       names["en"] ||
+      // 最後の最後の保険
       pickStr(data?.base?.title) ||
       pickStr(data?.title) ||
       "Item";
 
-    // ★ メタはベース言語で作成（name_ja を必ず含む）
+    // ここはそのまま
     const namesMeta = buildNamesMetaMinimal(langBase, names, displayName);
 
     line_items.push({
