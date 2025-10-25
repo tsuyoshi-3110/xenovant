@@ -41,9 +41,7 @@ type Keys =
   | "timeline"
   | "community"
   | "analytics"
-  | "orders"
-  | "inventory"
-  | "reports"
+  | "shipping"
   | "admin";
 
 const T: Record<UILangType, Record<Keys, string>> = {
@@ -51,7 +49,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     menuTitle: "メニュー",
     home: "ホーム",
     products: "商品一覧",
-    productsEC: "ネットショップ",
+    productsEC: "オンラインショップ",
     stores: "店舗一覧",
     about: "私たちの思い",
     company: "会社概要",
@@ -61,9 +59,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "タイムライン",
     community: "コミュニティ",
     analytics: "分析",
-    orders: "注文履歴",
-    inventory: "在庫管理",
-    reports: "レポート",
+    shipping: "EC管理",
     admin: "管理者ログイン",
   },
   en: {
@@ -80,9 +76,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Timeline",
     community: "Community",
     analytics: "Analyses",
-    orders: "Order History",
-    inventory: "Inventory Management",
-    reports: "Reports",
+    shipping: "Shipping Management",
     admin: "Administrator Login",
   },
   zh: {
@@ -99,9 +93,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "时间线",
     community: "社区",
     analytics: "分析",
-    orders: "销售记录",
-    inventory: "库存管理",
-    reports: "报告",
+    shipping: "EC管理",
     admin: "管理员登录",
   },
   "zh-TW": {
@@ -118,9 +110,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "時間軸",
     community: "社群",
     analytics: "分析",
-    orders: "銷售記錄",
-    inventory: "庫存管理",
-    reports: "報告",
+    shipping: "EC管理",
     admin: "管理者登入",
   },
   ko: {
@@ -137,9 +127,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "타임라인",
     community: "커뮤니티",
     analytics: "분석",
-    orders: "판매 내역",
-    inventory: "재고 관리",
-    reports: "보고서",
+    shipping: "배송 관리",
     admin: "관리자 로그인",
   },
   fr: {
@@ -156,9 +144,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Timeline",
     community: "Communauté",
     analytics: "Analyses",
-    orders: "Historique des commandes",
-    inventory: "Gestion des stocks",
-    reports: "Rapports",
+    shipping: "Gestion des expéditions",
     admin: "Connexion administrateur",
   },
   es: {
@@ -175,9 +161,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Cronología",
     community: "Comunidad",
     analytics: "Analítica",
-    orders: "Historial de pedidos",
-    inventory: "Gestión de inventario",
-    reports: "Informes",
+    shipping: "Gestión de envíos",
     admin: "Inicio de sesión administrador",
   },
   de: {
@@ -194,9 +178,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Timeline",
     community: "Community",
     analytics: "Analytik",
-    orders: "Bestellverlauf",
-    inventory: "Bestandsverwaltung",
-    reports: "Berichte",
+    shipping: "Versandverwaltung",
     admin: "Admin-Anmeldung",
   },
   pt: {
@@ -213,9 +195,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Linha do tempo",
     community: "Comunidade",
     analytics: "Análises",
-    orders: "Histórico de Pedidos",
-    inventory: "Gerenciamento de Inventário",
-    reports: "Relatórios",
+    shipping: "Gerenciamento de Envio",
     admin: "Login do administrador",
   },
   it: {
@@ -232,9 +212,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Timeline",
     community: "Community",
     analytics: "Analitiche",
-    orders: "Cronologia ordini",
-    inventory: "Gestione inventario",
-    reports: "Report",
+    shipping: "Gestione spedizioni",
     admin: "Accesso amministratore",
   },
   ru: {
@@ -251,9 +229,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Лента",
     community: "Сообщество",
     analytics: "Аналитика",
-    orders: "История заказов",
-    inventory: "Управление запасами",
-    reports: "Отчеты",
+    shipping: "Управление доставкой",
     admin: "Вход администратора",
   },
   th: {
@@ -270,9 +246,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "ไทม์ไลน์",
     community: "คอมมูนิตี้",
     analytics: "วิเคราะห์",
-    orders: "ประวัติการสั่งซื้อ",
-    inventory: "การจัดการสินค้าคงคลัง",
-    reports: "รายงาน",
+    shipping: "การจัดการการจัดส่ง",
     admin: "เข้าสู่ระบบผู้ดูแล",
   },
   vi: {
@@ -289,9 +263,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Dòng thời gian",
     community: "Cộng đồng",
     analytics: "Phân tích",
-    orders: "Lịch sử đơn hàng",
-    inventory: "Quản lý tồn kho",
-    reports: "Báo cáo",
+    shipping: "Quản lý vận chuyển",
     admin: "Đăng nhập quản trị",
   },
   id: {
@@ -308,9 +280,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "Linimasa",
     community: "Komunitas",
     analytics: "Analitik",
-    orders: "Riwayat pesanan",
-    inventory: "Manajemen inventaris",
-    reports: "Laporan",
+    shipping: "Manajemen Pengiriman",
     admin: "Masuk admin",
   },
   hi: {
@@ -327,9 +297,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "टाइमलाइन",
     community: "समुदाय",
     analytics: "विश्लेषण",
-    orders: "ऑर्डर इतिहास",
-    inventory: "इन्वेंटरी प्रबंधन",
-    reports: "रिपोर्ट",
+    shipping: "शिपिंग प्रबंधन",
     admin: "प्रशासक लॉगिन",
   },
   ar: {
@@ -346,9 +314,7 @@ const T: Record<UILangType, Record<Keys, string>> = {
     timeline: "الخط الزمني",
     community: "المجتمع",
     analytics: "التحليلات",
-    orders: "تاريخ الطلبات",
-    inventory: "إدارة المخزون",
-    reports: "التقارير",
+    shipping: "إدارة الشحن",
     admin: "تسجيل دخول المسؤول",
   },
 };
@@ -367,9 +333,7 @@ type MenuKey =
   | "timeline"
   | "community"
   | "analytics"
-  | "orders"
-  | "inventory"
-  | "reports"
+  | "shipping"
   | "admin";
 
 type MenuItem = { key: MenuKey; href: string; external?: boolean };
@@ -390,9 +354,7 @@ const FOOTER_ITEMS: MenuItem[] = [
   { key: "timeline", href: "/postList" },
   { key: "community", href: "/community" },
   { key: "analytics", href: "/analytics" },
-  { key: "orders", href: "/owner/orders" },
-  { key: "inventory", href: "/owner/inventory" },
-  { key: "reports", href: "/owner/reports" },
+  { key: "shipping", href: "/shipping" },
   { key: "admin", href: "/login" },
 ];
 
@@ -417,7 +379,6 @@ export default function Header({ className = "" }: { className?: string }) {
           `/api/sellers/connect-status?siteKey=${encodeURIComponent(SITE_KEY)}`
         );
         const data = await res.json();
-        // どちらの形式でもOKにする
         const ok = data?.connected === true || data?.status === "completed";
         setStripeConnected(!!ok);
       } catch {
@@ -502,7 +463,16 @@ export default function Header({ className = "" }: { className?: string }) {
   }, [i18nEnabled, allowedLangs, uiLang]);
 
   const t = T[effectiveLang] ?? T.ja;
-  const rtl = effectiveLang === "ar";
+
+  // ▼ この5項目は常に日本語で固定表示
+  const JP_ALWAYS = new Set<Keys>([
+    "timeline",
+    "community",
+    "analytics",
+    "shipping",
+    "admin",
+  ]);
+  const labelOf = (k: Keys) => (JP_ALWAYS.has(k) ? T.ja[k] : t[k]);
 
   /* 管理者リンク（3タップで表示 or クエリ） */
   const [showAdminLink, setShowAdminLink] = useState<boolean>(() => {
@@ -532,7 +502,6 @@ export default function Header({ className = "" }: { className?: string }) {
     const markShown = () => {
       setShowAdminLink(true);
       try {
-        // ここは従来どおり（ただし初期値では参照しないため、誤表示は起きない）
         sessionStorage.setItem("showAdminLinkSession", "1");
       } catch {}
     };
@@ -656,7 +625,7 @@ export default function Header({ className = "" }: { className?: string }) {
                 ? "[&>button]:text-white [&>button>svg]:!text-white [&>button>svg]:stroke-[3] [&>button>svg]:w-7 [&>button>svg]:h-6"
                 : "[&>button]:text-black [&>button>svg]:!text-black [&>button>svg]:stroke-[3] [&>button>svg]:w-7 [&>button>svg]:h-6"
             )}
-            dir={rtl ? "rtl" : "ltr"}
+            dir={effectiveLang === "ar" ? "rtl" : "ltr"}
           >
             {/* 先頭固定ヘッダー */}
             <SheetHeader className="px-6 py-4 border-b border-white/30">
@@ -682,7 +651,7 @@ export default function Header({ className = "" }: { className?: string }) {
                           onClick={handleMenuClose}
                           className="text-lg text-white text-outline hover:underline"
                         >
-                          {t[key]}
+                          {labelOf(key as Keys)}
                         </a>
                       ) : (
                         <Link
@@ -691,7 +660,7 @@ export default function Header({ className = "" }: { className?: string }) {
                           onClick={handleMenuClose}
                           className="text-lg text-white text-outline"
                         >
-                          {t[key]}
+                          {labelOf(key as Keys)}
                         </Link>
                       )
                     )}
@@ -699,7 +668,7 @@ export default function Header({ className = "" }: { className?: string }) {
 
                   {/* 言語ピッカー（ON かつ複数言語） */}
                   {showLangPicker && (
-                    <div className="flex flex-col items中心 gap-2 pb-6">
+                    <div className="flex flex-col items-center gap-2 pb-6">
                       <UILangFloatingPicker />
                     </div>
                   )}
@@ -712,17 +681,12 @@ export default function Header({ className = "" }: { className?: string }) {
               <div className="flex flex-col items-center gap-2">
                 {loggedIn &&
                   FOOTER_ITEMS.filter((m) =>
-                    [
-                      "timeline",
-                      "community",
-                      "analytics",
-                      "orders",
-                      "inventory",
-                      "reports",
-                    ].includes(m.key)
+                    ["timeline", "community", "analytics", "shipping"].includes(
+                      m.key
+                    )
                   )
-                    // ← 注文履歴は Stripe 連携済みのときのみ出す
-                    .filter((m) => m.key !== "orders" || stripeConnected)
+                    // 注文/配送の管理リンクは Stripe 連携済みのときのみ出す
+                    .filter((m) => m.key !== "shipping" || stripeConnected)
                     .map(({ key, href }) => (
                       <Link
                         key={key}
@@ -730,7 +694,7 @@ export default function Header({ className = "" }: { className?: string }) {
                         onClick={handleMenuClose}
                         className="text-center text-lg text-white text-outline"
                       >
-                        {t[key as Keys]}
+                        {labelOf(key as Keys)}
                       </Link>
                     ))}
 
@@ -740,7 +704,7 @@ export default function Header({ className = "" }: { className?: string }) {
                     onClick={handleMenuClose}
                     className="text-center text-lg text-white text-outline"
                   >
-                    {t.admin}
+                    {labelOf("admin")}
                   </Link>
                 )}
               </div>

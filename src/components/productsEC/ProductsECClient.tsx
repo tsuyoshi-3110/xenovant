@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { Pin, GripVertical } from "lucide-react";
+import { Pin, ShoppingBag } from "lucide-react";
 import { v4 as uuid } from "uuid";
 import imageCompression from "browser-image-compression";
 import {
@@ -22,7 +22,6 @@ import {
   getDocs,
   QueryDocumentSnapshot,
   where,
-  deleteDoc,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -46,16 +45,11 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core";
 import {
-  useSortable,
   arrayMove,
   SortableContext,
-  verticalListSortingStrategy,
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  restrictToVerticalAxis,
-  restrictToWindowEdges,
-} from "@dnd-kit/modifiers";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import SortableItem from "../SortableItem";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -75,6 +69,7 @@ import {
 
 // ★ 為替
 import { useFxRates } from "@/lib/fx/client";
+import FreeShippingBanner from "../FreeShippingBanner";
 
 /* ======================== 型＆ユーティリティ ======================== */
 
@@ -264,64 +259,6 @@ function ensurePriceInclFromDoc(p: ProdDoc): number {
   return p.taxIncluded === false ? Math.round(raw * (1 + TAX_RATE)) : raw;
 }
 
-/* ======================== DnD: セクション行 ======================== */
-function SortableSectionRow({
-  section,
-  onDelete,
-  children,
-}: {
-  section: Section;
-  onDelete: (id: string) => void;
-  children: React.ReactNode;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: section.id });
-
-  const style: React.CSSProperties = {
-    transform: transform
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : undefined,
-    transition: transition || undefined,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      <div
-        className={clsx(
-          "flex items-center justify-between border px-3 py-2 rounded bg-white",
-          isDragging && "opacity-80 shadow"
-        )}
-      >
-        <button
-          {...attributes}
-          {...listeners}
-          onClick={(e) => e.preventDefault()}
-          className="flex items-center gap-2 text-gray-500 cursor-grab active:cursor-grabbing p-2 -ml-2"
-          aria-label="並べ替え"
-          type="button"
-          style={{ touchAction: "none" }}
-        >
-          <GripVertical className="w-5 h-5" />
-        </button>
-        <div className="flex-1 px-2 truncate">{children}</div>
-        <button
-          onClick={() => onDelete(section.id)}
-          className="text-red-600 hover:underline"
-          type="button"
-        >
-          削除
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ======================== 本体 ======================== */
 export default function ProductsECClient() {
   // ▼ 商品
@@ -358,11 +295,9 @@ export default function ProductsECClient() {
   const [sections, setSections] = useState<Section[]>([]);
   const [selectedSectionId, setSelectedSectionId] = useState<string>("all");
 
-  // セクション管理モーダル
-  const [showSecModal, setShowSecModal] = useState(false);
-  const [newSecName, setNewSecName] = useState("");
-
   const [ecStop, setEcStop] = useState(false);
+  // 既存の state 群の近くに追加
+  const [freeShipMinJPY, setFreeShipMinJPY] = useState<number>(0);
 
   // ▼ 一覧表示用フィルタ（価格>0 & 未ログインなら非公開除外）
   const displayList = useMemo(
@@ -393,12 +328,6 @@ export default function ProductsECClient() {
       activationConstraint: { delay: 120, tolerance: 8 },
     })
   );
-  const sectionSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 140, tolerance: 6 },
-    })
-  );
 
   const isDark = useMemo(() => {
     const darkThemes: ThemeKey[] = ["brandG", "brandH", "brandI"];
@@ -416,6 +345,37 @@ export default function ProductsECClient() {
   );
 
   useEffect(() => onAuthStateChanged(auth, (u) => setIsAdmin(!!u)), []);
+
+  // 追加：送料無料しきい値（言語別）を購読
+  useEffect(() => {
+    const ref = doc(db, "siteShippingPolicy", SITE_KEY);
+    const unsub = onSnapshot(ref, (snap) => {
+      const data = snap.data() as any;
+      const enabled = !!data?.enabled;
+      if (!enabled) {
+        setFreeShipMinJPY(0);
+        return;
+      }
+      // thresholdByLang から UI 言語優先で取得。なければ ja、さらに無ければ最小値にフォールバック
+      const table = (data?.thresholdByLang ?? {}) as Record<string, unknown>;
+      const byLang = Number(table[uiLang]);
+      const fallbackJa = Number(table["ja"]);
+      const candidates = Object.values(table)
+        .map((v) => Number(v))
+        .filter((n) => Number.isFinite(n) && n > 0) as number[];
+      const minAcross = candidates.length ? Math.min(...candidates) : 0;
+
+      const chosen =
+        Number.isFinite(byLang) && byLang > 0
+          ? byLang
+          : Number.isFinite(fallbackJa) && fallbackJa > 0
+          ? fallbackJa
+          : minAcross;
+
+      setFreeShipMinJPY(chosen ? Math.round(chosen) : 0);
+    });
+    return () => unsub();
+  }, [uiLang]);
 
   useEffect(() => {
     const ref = doc(db, "siteSellers", SITE_KEY);
@@ -806,82 +766,6 @@ export default function ProductsECClient() {
     await batch.commit();
   };
 
-  /* ========== セクション追加/削除/並べ替え ========== */
-  const handleAddSection = async () => {
-    const titleJa = newSecName.trim();
-    if (!titleJa) return;
-    if (sections.some((s) => s.base.title === titleJa)) {
-      alert("同名のセクションが既に存在します");
-      return;
-    }
-    try {
-      setSaving(true);
-      // ja は翻訳対象から除外
-      const t = await (async () => {
-        const jobs = LANGS.filter((l) => l.key !== "ja").map(async (l) => {
-          const res = await fetch("/api/translate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title: titleJa, body: "", target: l.key }),
-          });
-          if (!res.ok) throw new Error(`section translate failed: ${l.key}`);
-          const data = (await res.json()) as { title?: string };
-          return { lang: l.key, title: (data.title ?? "").trim() };
-        });
-        return Promise.all(jobs);
-      })();
-
-      const nextOrder =
-        Math.max(
-          -1,
-          ...sections.map((s) => (typeof s.order === "number" ? s.order : -1))
-        ) + 1;
-
-      await addDoc(sectionColRef, {
-        base: { title: titleJa },
-        t,
-        createdAt: serverTimestamp(),
-        order: nextOrder,
-      });
-      setNewSecName("");
-      setShowSecModal(false);
-    } catch (e) {
-      console.error(e);
-      alert("セクションの追加に失敗しました");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteSection = async (id: string) => {
-    if (!confirm("このセクションを削除しますか？")) return;
-    try {
-      await deleteDoc(doc(sectionColRef, id));
-      if (selectedSectionId === id) setSelectedSectionId("all");
-      if (formSectionId === id) setFormSectionId("");
-    } catch (e) {
-      console.error(e);
-      alert("セクションの削除に失敗しました");
-    }
-  };
-
-  const handleSectionDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = sections.findIndex((s) => s.id === active.id);
-    const newIndex = sections.findIndex((s) => s.id === over.id);
-    const newList = arrayMove(sections, oldIndex, newIndex);
-
-    const batch = writeBatch(db);
-    newList.forEach((s, idx) => {
-      batch.update(doc(sectionColRef, s.id), { order: idx });
-    });
-
-    setSections(newList.map((s, idx) => ({ ...s, order: idx })));
-    await batch.commit();
-  };
-
   // ラベル（メニュー上部の現在表示カテゴリ）
   const currentSectionLabel =
     selectedSectionId === "all"
@@ -893,12 +777,59 @@ export default function ProductsECClient() {
         )
       : "";
 
+  const freeShipPriceText = useMemo(
+    () => formatPriceByLang(freeShipMinJPY, uiLang, rates),
+    [freeShipMinJPY, uiLang, rates]
+  );
+
   if (!gradient) return null;
 
   /* ======================== UI ======================== */
   return (
     <main className="max-w-5xl mx-auto p-4 pt-10">
       <BusyOverlay uploadingPercent={uploadingPercent} saving={saving} />
+
+      {/* オンラインショップ 見出し（大） */}
+      <header className="mb-6" role="banner" aria-label="オンラインショップ">
+        <div
+          className={clsx(
+            "bg-gradient-to-br rounded-2xl border shadow-lg",
+            "px-5 py-6 sm:px-7 sm:py-8",
+            gradient
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <ShoppingBag
+              className={clsx("w-8 h-8", isDark ? "text-white" : "text-black")}
+              aria-hidden="true"
+            />
+            <h1
+              className={clsx(
+                "text-3xl sm:text-4xl font-extrabold tracking-tight",
+                isDark ? "text-white" : "text-gray-900"
+              )}
+            >
+              オンラインショップ
+            </h1>
+          </div>
+          <p
+            className={clsx(
+              "mt-2 text-sm sm:text-base",
+              isDark ? "text-white/80" : "text-gray-600"
+            )}
+          >
+            公式オンラインストア / Online Store
+          </p>
+        </div>
+      </header>
+
+      {/* ▼ 送料無料バナー（しきい値が設定されている時のみ表示） */}
+      <FreeShippingBanner
+        show={freeShipMinJPY > 0}
+        lang={uiLang}
+        priceText={freeShipPriceText}
+        sticky
+      />
 
       {ecStop && (
         <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center">
@@ -944,94 +875,7 @@ export default function ProductsECClient() {
             </span>
           </div>
         </div>
-
-        {isAdmin && (
-          <button
-            onClick={() => setShowSecModal(true)}
-            className="px-3 py-2 rounded bg-blue-600 text-white shadow hover:bg-blue-700"
-          >
-            セクション管理
-          </button>
-        )}
       </div>
-
-      {/* ▼ セクション管理モーダル */}
-      {showSecModal && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-3 overscroll-contain">
-          <div
-            className={clsx(
-              "w-full max-w-sm sm:max-w-md",
-              "max-h-[90vh]",
-              "bg-white rounded-lg flex flex-col"
-            )}
-            role="dialog"
-            aria-modal="true"
-          >
-            <div className="px-4 py-3 border-b">
-              <h2 className="text-lg font-bold text-center sm:text-left">
-                セクション管理
-              </h2>
-            </div>
-
-            <div className="px-4 py-4 space-y-4 overflow-y-auto min-h-0 overscroll-contain">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  placeholder="セクション名（例：クレープ）"
-                  value={newSecName}
-                  onChange={(e) => setNewSecName(e.target.value)}
-                  className="flex-1 border px-3 py-2 rounded"
-                />
-                <button
-                  onClick={handleAddSection}
-                  disabled={!newSecName.trim() || saving}
-                  className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50 w-full sm:w-auto"
-                >
-                  追加
-                </button>
-              </div>
-
-              <DndContext
-                sensors={sectionSensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleSectionDragEnd}
-                modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-              >
-                <SortableContext
-                  items={sections.map((s) => s.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-2">
-                    {sections.length === 0 && (
-                      <p className="text-sm text-gray-500">
-                        セクションはまだありません。
-                      </p>
-                    )}
-                    {sections.map((s) => (
-                      <SortableSectionRow
-                        key={s.id}
-                        section={s}
-                        onDelete={handleDeleteSection}
-                      >
-                        {s.base?.title ?? ""}
-                      </SortableSectionRow>
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
-
-            <div className="px-4 py-3 border-t">
-              <button
-                onClick={() => setShowSecModal(false)}
-                className="w-full px-4 py-2 bg-gray-500 text-white rounded"
-              >
-                閉じる
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ▼ 商品一覧（通貨表示は UI 言語に応じて変換） */}
       <DndContext

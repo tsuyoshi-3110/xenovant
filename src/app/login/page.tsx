@@ -147,7 +147,7 @@ function StripeConnectCard() {
 /* =========================
    Ship&co への導線カード（アカウント作成リンク）
 ========================= */
- function ShipAndCoLinkCard() {
+function ShipAndCoLinkCard() {
   return (
     <Card className="shadow-xl bg-white/70 backdrop-blur-sm border border-gray-200">
       <CardHeader>
@@ -226,7 +226,7 @@ const JP_LANG_LABELS: Record<UILang, string> = {
 const MENU_ITEMS: { key: string; label: string }[] = [
   { key: "home", label: "ホーム" },
   { key: "products", label: "商品一覧" },
-  { key: "productsEC", label: "ネットショップ" },
+  { key: "productsEC", label: "オンラインショップ" },
   { key: "stores", label: "店舗一覧" },
   { key: "about", label: "私たちの思い" },
   { key: "company", label: "会社概要" },
