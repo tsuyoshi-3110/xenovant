@@ -111,9 +111,9 @@ function sum(items: OrderItem[] = []) {
 export default async function ReportsPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const sp = searchParams;
+  const sp = await searchParams;
   const { fromJ, toJ } = parseRange(sp.from, sp.to);
 
   // Firestore：期間内（昇順）
