@@ -37,11 +37,9 @@ type Keys =
   | "company"
   | "news"
   | "interview"
-  | "cart"
   | "timeline"
   | "community"
   | "analytics"
-  | "shipping"
   | "admin";
 
 const T: Record<UILangType, Record<Keys, string>> = {
@@ -55,11 +53,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "会社概要",
     news: "お知らせ",
     interview: "取材はこちら",
-    cart: "カート",
     timeline: "タイムライン",
     community: "コミュニティ",
     analytics: "分析",
-    shipping: "EC管理",
     admin: "管理者ログイン",
   },
   en: {
@@ -72,11 +68,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Company",
     news: "News",
     interview: "Press & Inquiries",
-    cart: "Cart",
     timeline: "Timeline",
     community: "Community",
     analytics: "Analyses",
-    shipping: "Shipping Management",
     admin: "Administrator Login",
   },
   zh: {
@@ -89,11 +83,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "公司简介",
     news: "通知",
     interview: "媒体采访",
-    cart: "购物车",
     timeline: "时间线",
     community: "社区",
     analytics: "分析",
-    shipping: "EC管理",
     admin: "管理员登录",
   },
   "zh-TW": {
@@ -106,11 +98,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "公司簡介",
     news: "最新消息",
     interview: "媒體採訪",
-    cart: "購物車",
     timeline: "時間軸",
     community: "社群",
     analytics: "分析",
-    shipping: "EC管理",
     admin: "管理者登入",
   },
   ko: {
@@ -123,11 +113,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "회사 소개",
     news: "알림",
     interview: "취재 문의",
-    cart: "장바구니",
     timeline: "타임라인",
     community: "커뮤니티",
     analytics: "분석",
-    shipping: "배송 관리",
     admin: "관리자 로그인",
   },
   fr: {
@@ -140,11 +128,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Entreprise",
     news: "Actualités",
     interview: "Presse",
-    cart: "Panier",
     timeline: "Timeline",
     community: "Communauté",
     analytics: "Analyses",
-    shipping: "Gestion des expéditions",
     admin: "Connexion administrateur",
   },
   es: {
@@ -157,11 +143,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Empresa",
     news: "Noticias",
     interview: "Prensa",
-    cart: "Carrito",
     timeline: "Cronología",
     community: "Comunidad",
     analytics: "Analítica",
-    shipping: "Gestión de envíos",
     admin: "Inicio de sesión administrador",
   },
   de: {
@@ -174,11 +158,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Unternehmen",
     news: "Neuigkeiten",
     interview: "Presse",
-    cart: "Warenkorb",
     timeline: "Timeline",
     community: "Community",
     analytics: "Analytik",
-    shipping: "Versandverwaltung",
     admin: "Admin-Anmeldung",
   },
   pt: {
@@ -191,11 +173,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Empresa",
     news: "Notícias",
     interview: "Imprensa",
-    cart: "Carrinho",
     timeline: "Linha do tempo",
     community: "Comunidade",
     analytics: "Análises",
-    shipping: "Gerenciamento de Envio",
     admin: "Login do administrador",
   },
   it: {
@@ -208,11 +188,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Azienda",
     news: "Notizie",
     interview: "Stampa",
-    cart: "Carrello",
     timeline: "Timeline",
     community: "Community",
     analytics: "Analitiche",
-    shipping: "Gestione spedizioni",
     admin: "Accesso amministratore",
   },
   ru: {
@@ -225,11 +203,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "О компании",
     news: "Новости",
     interview: "Для прессы",
-    cart: "Корзина",
     timeline: "Лента",
     community: "Сообщество",
     analytics: "Аналитика",
-    shipping: "Управление доставкой",
     admin: "Вход администратора",
   },
   th: {
@@ -242,11 +218,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "ข้อมูลบริษัท",
     news: "ประกาศ",
     interview: "ติดต่อสื่อ",
-    cart: "ตะกร้าสินค้า",
     timeline: "ไทม์ไลน์",
     community: "คอมมูนิตี้",
     analytics: "วิเคราะห์",
-    shipping: "การจัดการการจัดส่ง",
     admin: "เข้าสู่ระบบผู้ดูแล",
   },
   vi: {
@@ -259,11 +233,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Hồ sơ công ty",
     news: "Thông báo",
     interview: "Báo chí",
-    cart: "Giỏ hàng",
     timeline: "Dòng thời gian",
     community: "Cộng đồng",
     analytics: "Phân tích",
-    shipping: "Quản lý vận chuyển",
     admin: "Đăng nhập quản trị",
   },
   id: {
@@ -276,11 +248,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "Profil perusahaan",
     news: "Pemberitahuan",
     interview: "Untuk media",
-    cart: "Keranjang",
     timeline: "Linimasa",
     community: "Komunitas",
     analytics: "Analitik",
-    shipping: "Manajemen Pengiriman",
     admin: "Masuk admin",
   },
   hi: {
@@ -293,11 +263,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "कंपनी प्रोफ़ाइल",
     news: "सूचनाएँ",
     interview: "प्रेस",
-    cart: "कार्ट",
     timeline: "टाइमलाइन",
     community: "समुदाय",
     analytics: "विश्लेषण",
-    shipping: "शिपिंग प्रबंधन",
     admin: "प्रशासक लॉगिन",
   },
   ar: {
@@ -310,11 +278,9 @@ const T: Record<UILangType, Record<Keys, string>> = {
     company: "نبذة عن الشركة",
     news: "الإشعارات",
     interview: "للاعلام",
-    cart: "عربة التسوق",
     timeline: "الخط الزمني",
     community: "المجتمع",
     analytics: "التحليلات",
-    shipping: "إدارة الشحن",
     admin: "تسجيل دخول المسؤول",
   },
 };
@@ -329,11 +295,9 @@ type MenuKey =
   | "company"
   | "news"
   | "interview"
-  | "cart"
   | "timeline"
   | "community"
   | "analytics"
-  | "shipping"
   | "admin";
 
 type MenuItem = { key: MenuKey; href: string; external?: boolean };
@@ -347,14 +311,12 @@ const MENU_ITEMS: MenuItem[] = [
   { key: "company", href: "/company" },
   { key: "news", href: "/news" },
   { key: "interview", href: "/blog" },
-  { key: "cart", href: "/cart" },
 ];
 
 const FOOTER_ITEMS: MenuItem[] = [
   { key: "timeline", href: "/postList" },
   { key: "community", href: "/community" },
   { key: "analytics", href: "/analytics" },
-  { key: "shipping", href: "/shipping" },
   { key: "admin", href: "/login" },
 ];
 
@@ -469,7 +431,6 @@ export default function Header({ className = "" }: { className?: string }) {
     "timeline",
     "community",
     "analytics",
-    "shipping",
     "admin",
   ]);
   const labelOf = (k: Keys) => (JP_ALWAYS.has(k) ? T.ja[k] : t[k]);
@@ -686,7 +647,7 @@ export default function Header({ className = "" }: { className?: string }) {
                     )
                   )
                     // 注文/配送の管理リンクは Stripe 連携済みのときのみ出す
-                    .filter((m) => m.key !== "shipping" || stripeConnected)
+                    .filter(() => stripeConnected)
                     .map(({ key, href }) => (
                       <Link
                         key={key}

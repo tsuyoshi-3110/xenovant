@@ -150,7 +150,7 @@ export default function CartPage() {
 
   // 送料無料ポリシー
   const [thresholdByLang, setThresholdByLang] = useState<Record<string, number>>({});
-  const [defaultThresholdJPY, setDefaultThresholdJPY] = useState<number>(0); // ★ 追加：グローバル既定
+  const [defaultThresholdJPY, setDefaultThresholdJPY] = useState<number>(0); // グローバル既定
   const [policyEnabled, setPolicyEnabled] = useState<boolean>(true);
   const [policyLoaded, setPolicyLoaded] = useState(false);
 
@@ -206,7 +206,6 @@ export default function CartPage() {
           const raw = siteSnap.data() || {};
           setPolicyEnabled(raw?.enabled !== false);
           setThresholdByLang(normalizeLangNumberMap(raw?.thresholdByLang));
-          // ★ ここでグローバル既定も見る（現行 thresholdDefaultJPY / 旧 thresholdJPY）
           const defThr = Number(raw?.thresholdDefaultJPY ?? raw?.thresholdJPY);
           setDefaultThresholdJPY(Number.isFinite(defThr) ? Math.max(0, Math.floor(defThr)) : 0);
         } else {
@@ -229,7 +228,7 @@ export default function CartPage() {
     [items]
   );
 
-  // ★ 言語別が無ければグローバル既定を使う
+  // 言語別が無ければグローバル既定を使う
   const currentThresholdJPY = useMemo(() => {
     for (const k of langCandidates(uiLang)) {
       const v = thresholdByLang[k];
@@ -237,7 +236,7 @@ export default function CartPage() {
       const vv = Number(v as any);
       if (Number.isFinite(vv) && vv > 0) return Math.floor(vv);
     }
-    if (defaultThresholdJPY > 0) return defaultThresholdJPY; // ← フォールバック
+    if (defaultThresholdJPY > 0) return defaultThresholdJPY;
     return 0;
   }, [thresholdByLang, defaultThresholdJPY, uiLang]);
 
@@ -246,23 +245,30 @@ export default function CartPage() {
     [policyLoaded, policyEnabled, currentThresholdJPY, subtotalJPY]
   );
 
+  /**
+   * ★ 修正ポイント：
+   * - 0円を「有効な設定」として採用（>= 0）
+   * - フォールバックは「キーが無い時だけ」。0 が入っているのに他言語へ落ちない
+   */
   const resolvedShippingBaseJPY = useMemo(() => {
     if (Object.keys(shippingPrices).length === 0) return null;
     for (const k of langCandidates(uiLang)) {
-      const v = shippingPrices[k];
-      if (typeof v === "number" && v > 0) return v | 0;
-      const vv = Number(v as any);
-      if (Number.isFinite(vv) && vv > 0) return Math.floor(vv);
+      if (!(k in shippingPrices)) continue; // キーが無いときのみ次へ
+      const v = Number((shippingPrices as any)[k]);
+      if (Number.isFinite(v) && v >= 0) return Math.floor(v); // 0 を有効値として採用
     }
     return null;
   }, [shippingPrices, uiLang]);
 
   const hasShippingConfig = resolvedShippingBaseJPY != null;
+  const isZeroShippingBase = resolvedShippingBaseJPY === 0;
 
   const shippingJPY = useMemo(() => {
     if (!hasShippingConfig) return 0;
-    return isFreeShipping ? 0 : (resolvedShippingBaseJPY as number);
-  }, [hasShippingConfig, isFreeShipping, resolvedShippingBaseJPY]);
+    if (isFreeShipping) return 0;
+    if (isZeroShippingBase) return 0;
+    return resolvedShippingBaseJPY as number;
+  }, [hasShippingConfig, isFreeShipping, isZeroShippingBase, resolvedShippingBaseJPY]);
 
   const grandTotalJPY = useMemo(() => subtotalJPY + shippingJPY, [subtotalJPY, shippingJPY]);
 
@@ -381,7 +387,7 @@ export default function CartPage() {
                   <span className="font-semibold">{ui.shipping}</span>
                 </div>
 
-                {isFreeShipping ? (
+                {isFreeShipping || isZeroShippingBase ? (
                   <p className="text-sm text-green-700">{ui.freeApplied}</p>
                 ) : (
                   <div className="flex items-center justify-between">

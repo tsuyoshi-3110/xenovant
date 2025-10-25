@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { Pin, ShoppingBag } from "lucide-react";
+import { Pin, ShoppingBag, ShoppingCart, Settings } from "lucide-react";
 import { v4 as uuid } from "uuid";
 import imageCompression from "browser-image-compression";
 import {
@@ -56,6 +56,7 @@ import { motion } from "framer-motion";
 import ProductMedia from "../ProductMedia";
 import { SITE_KEY } from "@/lib/atoms/siteKeyAtom";
 import Image from "next/image";
+
 // 多言語
 import { LANGS, type LangKey } from "@/lib/langs";
 import { useUILang, type UILang } from "@/lib/atoms/uiLangAtom";
@@ -794,27 +795,89 @@ export default function ProductsECClient() {
         <div
           className={clsx(
             "bg-gradient-to-br rounded-2xl border shadow-lg",
-            "px-5 py-6 sm:px-7 sm:py-8",
+            "px-4 py-4 sm:px-7 sm:py-8",
             gradient
           )}
         >
-          <div className="flex items-center gap-3">
-            <ShoppingBag
-              className={clsx("w-8 h-8", isDark ? "text-white" : "text-black")}
-              aria-hidden="true"
-            />
-            <h1
-              className={clsx(
-                "text-3xl sm:text-4xl font-extrabold tracking-tight",
-                isDark ? "text-white" : "text-gray-900"
+          {/* 上段：タイトル（常に1行） + 管理 / カートボタン */}
+          <div className="flex items-center justify-between gap-3">
+            {/* 左：アイコン＋タイトル（1行固定・省略記号） */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <ShoppingBag
+                className={clsx(
+                  "w-7 h-7 sm:w-8 sm:h-8",
+                  isDark ? "text-white" : "text-black"
+                )}
+                aria-hidden="true"
+              />
+              <h1
+                className={clsx(
+                  "font-extrabold tracking-tight leading-none",
+                  "text-2xl sm:text-4xl",
+                  "whitespace-nowrap truncate",
+                  isDark ? "text-white" : "text-gray-900"
+                )}
+                title="オンラインショップ"
+              >
+                オンラインショップ
+              </h1>
+            </div>
+
+            {/* 右：EC管理（ログイン時のみ） + 大きいカート */}
+            <div className="flex items-center gap-2 shrink-0">
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => router.push("/shipping")}
+                  className={clsx(
+                    "inline-flex items-center justify-center",
+                    "h-10 px-4 rounded-full border shadow",
+                    "bg-white/95 hover:bg-white transition",
+                    "focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  )}
+                  aria-label="EC管理"
+                  title="EC管理"
+                >
+                  <Settings
+                    className={clsx(
+                      "w-5 h-5",
+                      isDark ? "text-gray-900" : "text-gray-900"
+                    )}
+                  />
+                  <span className="ml-1 text-sm font-medium hidden sm:inline">
+                    EC管理
+                  </span>
+                </button>
               )}
-            >
-              オンラインショップ
-            </h1>
+
+              <button
+                type="button"
+                onClick={() => router.push("/cart")}
+                className={clsx(
+                  "relative inline-flex items-center justify-center",
+                  "h-14 w-14 sm:h-14 sm:w-14",
+                  "rounded-full border shadow",
+                  "bg-white/95 hover:bg-white transition",
+                  "focus:outline-none focus:ring-2 focus:ring-blue-400"
+                )}
+                aria-label="カートへ移動"
+                title="カートへ移動"
+              >
+                <ShoppingCart
+                  className={clsx(
+                    "w-8 h-8",
+                    isDark ? "text-gray-900" : "text-gray-900"
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
           </div>
+
+          {/* サブタイトル */}
           <p
             className={clsx(
-              "mt-2 text-sm sm:text-base",
+              "mt-2 text-xs sm:text-base",
               isDark ? "text-white/80" : "text-gray-600"
             )}
           >
