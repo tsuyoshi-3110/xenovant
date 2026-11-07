@@ -43,7 +43,7 @@ export default function SubscriptionOverlay({ siteKey }: { siteKey: string }) {
     };
 
     const fetchPlanFlags = async () => {
-      const ref = doc(db, "siteSettings", siteKey);
+      const ref = doc(db, "sitePublicProfile", siteKey);
       const snap = await getDoc(ref);
       const data = snap.exists() ? snap.data() : {};
 

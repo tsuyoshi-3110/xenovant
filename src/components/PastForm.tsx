@@ -35,7 +35,7 @@ export default function PostForm() {
 
   useEffect(() => {
     (async () => {
-      const s1 = await getDoc(doc(db, "siteSettings", SITE_KEY));
+      const s1 = await getDoc(doc(db, "sitePublicProfile", SITE_KEY));
       if (s1.exists()) setSiteName((s1.data() as any).siteName ?? "Anonymous");
       const s2 = await getDoc(doc(db, "siteSettingsEditable", SITE_KEY));
       if (s2.exists())

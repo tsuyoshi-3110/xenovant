@@ -1,7 +1,5 @@
 "use client";
 import { useState } from "react";
-import { getDoc, doc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -24,23 +22,23 @@ export default function ForgotEmail({ onClose, onEmailFound }: Props) {
     setError("");
 
     try {
-      const ref = doc(db, "siteSettings", SITE_KEY);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) {
-        setError("設定が見つかりません。");
+      const res = await fetch("/api/auth/forgot-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteKey: SITE_KEY, phone: phone }),
+      });
+      if (res.status === 404) {
+        setError("一致する電話番号が見つかりません。");
         return;
       }
-
-      const data = snap.data();
-      if (data.ownerPhone && data.ownerPhone === phone) {
-        const foundEmail = data.ownerEmail ?? "（メールアドレスが未登録です）";
-        setEmail(foundEmail);
-
-        if (onEmailFound && data.ownerEmail) {
-          onEmailFound(data.ownerEmail);
-        }
-      } else {
-        setError("一致する電話番号が見つかりません。");
+      if (!res.ok) {
+        setError("エラーが発生しました。");
+        return;
+      }
+      const data = (await res.json()) as { email?: string };
+      setEmail(data.email ?? "（メールアドレスが未登録です）");
+      if (onEmailFound && data.email) {
+        onEmailFound(data.email);
       }
     } catch (e) {
       console.error(e);

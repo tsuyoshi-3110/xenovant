@@ -126,7 +126,7 @@ function Comments({ postId, myUid }: { postId: string; myUid: string | null }) {
     (async () => {
       try {
         const [siteDoc, editableDoc] = await Promise.all([
-          getDoc(doc(db, "siteSettings", SITE_KEY)),
+          getDoc(doc(db, "sitePublicProfile", SITE_KEY)),
           getDoc(doc(db, "siteSettingsEditable", SITE_KEY)),
         ]);
         if (!mounted) return;
